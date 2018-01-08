@@ -1,18 +1,38 @@
 package com.my.weather.domain;
 
+import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+@Entity
 public class Location {
-
-    private String lat;
-    
+    @JsonIgnore
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String lat;    
     private String lon;
     private String lat_wgs84;
     private String lon_wgs84;
     private String locationName;
     private String stationId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn( name = "TIME_ID" )
     private Time time;
-    private WeatherElement[] weatherElement;
-    private Parameter[] parameter;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn( name = "LOCATION_ID" )
+    private List<WeatherElement> weatherElement;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn( name = "LOCATION_ID" )
+    private List<Parameter> parameter;
     public String getLat() {
         return lat;
     }
@@ -55,16 +75,16 @@ public class Location {
     public void setTime(Time time) {
         this.time = time;
     }
-    public WeatherElement[] getWeatherElement() {
+    public List<WeatherElement> getWeatherElement() {
         return weatherElement;
     }
-    public void setWeatherElement(WeatherElement[] weatherElement) {
+    public void setWeatherElement(List<WeatherElement> weatherElement) {
         this.weatherElement = weatherElement;
     }
-    public Parameter[] getParameter() {
+    public List<Parameter> getParameter() {
         return parameter;
     }
-    public void setParameter(Parameter[] parameter) {
+    public void setParameter(List<Parameter> parameter) {
         this.parameter = parameter;
     }
     

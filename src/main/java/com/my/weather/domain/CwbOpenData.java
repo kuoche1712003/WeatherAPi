@@ -1,10 +1,18 @@
 package com.my.weather.domain;
 
 import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+@Entity
 public class CwbOpenData {
+    @Id
     private String identifier;
     private String sender;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'+08:00'", locale = "zh", timezone = "GMT+8")
@@ -14,7 +22,9 @@ public class CwbOpenData {
     private String dataid;
     private String scope;
     private String dataset;
-    private Location[] location;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn( name = "CWBOPENDATA_ID" )
+    private List<Location> location;
     public String getIdentifier() {
         return identifier;
     }
@@ -63,10 +73,10 @@ public class CwbOpenData {
     public void setDataset(String dataset) {
         this.dataset = dataset;
     }
-    public Location[] getLocation() {
+    public List<Location> getLocation() {
         return location;
     }
-    public void setLocation(Location[] location) {
+    public void setLocation(List<Location> location) {
         this.location = location;
     }
     

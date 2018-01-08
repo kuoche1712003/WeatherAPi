@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,6 +24,7 @@ import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.my.weather.domain.CwbOpenData;
 import com.my.weather.domain.Location;
+import com.my.weather.repository.CwbOpenDataRepository;
 
 @SpringBootApplication
 public class WeatherApplication {
@@ -33,7 +34,9 @@ public class WeatherApplication {
     public static void main(String[] args) {
         SpringApplication.run(WeatherApplication.class, args);
     }
-
+    @Autowired
+    CwbOpenDataRepository repo;
+    
     @Bean
     CommandLineRunner myMethod() {
         return args -> {
@@ -49,9 +52,7 @@ public class WeatherApplication {
             //用Xmlmapper轉換xml成object
             CwbOpenData data = mapper.readValue(weatherFile, CwbOpenData.class);
             //寫log測試是否成功轉換
-            log.info(data.getLocation()[0].getLat());
-            //用標準輸出輸出json String 測試是否成功轉換
-            System.out.println(jsonmapper.writerWithDefaultPrettyPrinter().writeValueAsString(data.getLocation()[0]));
+            repo.save(data);
         };
     }
 
