@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 
@@ -25,7 +26,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.my.weather.domain.CwbOpenData;
 import com.my.weather.domain.Location;
 import com.my.weather.repository.CwbOpenDataRepository;
-
+import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class WeatherApplication {
     
@@ -38,10 +39,16 @@ public class WeatherApplication {
     CwbOpenDataRepository repo;
     
     @Bean
-    CommandLineRunner myMethod() {
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder.build();
+    }
+    
+    @Bean
+    CommandLineRunner myMethod(RestTemplate restTemplate) {
         return args -> {
-            //讀放在src/main/resources裡的xml檔案
-            File weatherFile = new File(getClass().getClassLoader().getResource("weather.xml").getFile());
+            
+            String xml = restTemplate.getForObject("http://opendata.cwb.gov.tw/opendataapi?dataid=O-A0001-001&authorizationkey=CWB-849CAA88-0A70-41E9-B763-7B1C95EC0B3D",String.class);
+            
             //建立jackson的XmlMapper用來將Xml file轉換成java object
             JacksonXmlModule module = new JacksonXmlModule();
             module.setDefaultUseWrapper(false);
@@ -49,9 +56,8 @@ public class WeatherApplication {
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             //建立ObjectMapper用來將Object轉換成json string
             ObjectMapper jsonmapper = new ObjectMapper();
-            //用Xmlmapper轉換xml成object
-            CwbOpenData data = mapper.readValue(weatherFile, CwbOpenData.class);
-            //寫log測試是否成功轉換
+            
+            CwbOpenData data = mapper.readValue(xml, CwbOpenData.class);
             repo.save(data);
         };
     }
