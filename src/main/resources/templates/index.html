@@ -7,31 +7,125 @@
   <link rel="stylesheet" type="text/css" media="all" href="css/bootstrap.min.css"></link>
   <link rel="stylesheet" type="text/css" media="all" href="css/bootstrap-glyphicons.css"></link>
   <link rel="stylesheet" type="text/css" media="all" href="css/styles.css"></link>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+  <script
+    src="https://code.jquery.com/jquery-2.2.4.min.js"
+    integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+    crossorigin="anonymous"></script>
 </head>
 
 <body>
 <div class="container">
   <h1>Weather</h1>
-  <select class="custom-select" id="locationName">
-
-  </select>
+  <div class="row">
+    <div class="col-xs-6">
+        <p><b>測站名稱 :</b></p>
+        <select class="custom-select" id="locationName"></select>
+    </div>
+    <div class="col-xs-6">
+        <span><b>觀測時間 :</b></span>
+        <span id="obsTime"></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-3">
+        <span><b>高度:　</b></span>
+        <span id="ELEV"></span>
+        <span><b>　公尺</b></span>
+    </div>
+    <div class="col-xs-3">
+        <span><b>風向:　</b></span>
+        <span id="WDIR"></span>
+        <span><b>　度</b></span>
+    </div>
+    <div class="col-xs-3">
+        <span><b>風速:　</b></span>
+        <span id="WDSD"></span>
+        <span><b>　公尺/秒</b></span>
+    </div>
+    <div class="col-xs-3">
+        <span><b>溫度:　</b></span>
+        <span id="TEMP"></span>
+         <span><b>　攝氏</b></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-3">
+        <span><b>相對濕度:　</b></span>
+        <span id="HUMD"></span>
+        <span><b>　百分比率</b></span>
+    </div>
+    <div class="col-xs-3">
+        <span><b>測站氣壓:　</b></span>
+        <span id="PRES"></span>
+        <span><b>　百帕</b></span>
+    </div>
+    <div class="col-xs-3">
+        <span><b>日照時數:　</b></span>
+        <span id="SUN"></span>
+        <span><b>　小時</b></span>
+    </div>
+    <div class="col-xs-3">
+        <span><b>日累積雨量:　</b></span>
+        <span id="H_24R"></span>
+         <span><b>　毫米</b></span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-4">
+        <span><b>小時最大陣風風速:　</b></span>
+        <span id="H_FX"></span>
+        <span><b>　公尺/秒 </b></span>
+    </div>
+    <div class="col-xs-4">
+        <span><b>小時最大陣風風向:　</b></span>
+        <span id="H_XD"></span>
+        <span><b>　度</b></span>
+    </div>
+    <div class="col-xs-4">
+        <span><b>小時最大陣風時間:　</b></span>
+        <span id="H_FXT"></span>
+    </div>
+  </div>
 </div>
 </body>
 </html>
 <script>
     $(document).ready(function(){
-    	
     	$.ajax({
     		url:"http://localhost:8080/getLocationName",
    			dataType: "json",
    			type: "GET",
    			success: function(response){
    				$.each(response, function(index,value){
-    				$('#locationName').append('<option value="'+value+'">'+value+'</option>');
-    			})
+                    $('#locationName').append('<option value="'+value+'">'+value+'</option>');
+                })
     		}
     	})
-    	
+    	var url = 'http://localhost:8080/locations/search/findByLocationName'
+    	$('#locationName').on('change',function(){
+    		$.ajax({
+                url:url,
+                dataType: "json",
+                data:{locationName:$('#locationName').val()},
+                type: "GET",
+                success: function(response){
+                    $('#obsTime').text(response._embedded.locations[0].time.obsTime);
+                    var weather = response._embedded.locations[0].weatherElement;
+                    console.log(weather);
+                    $.each(weather,function(index,value){
+                    	var text = value.elementValue[0].value;
+                    	if(text=="-99")
+                    	{
+                    	    text = "因故無資料";
+                    	}
+                    	$('#'+value.elementName).text(text);
+                    })
+                }
+            })
+    	})
+        
     });
+   
+    	
+   
 </script>
