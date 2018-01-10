@@ -23,7 +23,7 @@
     </div>
     <div class="col-xs-6">
         <span><b>觀測時間 :</b></span>
-        <span id="obsTime"></span>
+        <select class="custom-select" id="obsTime"></select>
     </div>
   </div>
   <div class="row">
@@ -92,25 +92,46 @@
 <script>
     $(document).ready(function(){
     	$.ajax({
-    		url:"http://localhost:8080/getLocationName",
+    		url:"/getLocationName",
    			dataType: "json",
    			type: "GET",
    			success: function(response){
    				$.each(response, function(index,value){
                     $('#locationName').append('<option value="'+value+'">'+value+'</option>');
                 })
+                $('#locationName option:first').change();
     		}
     	})
-    	var url = 'http://localhost:8080/locations/search/findByLocationName'
+    	
     	$('#locationName').on('change',function(){
     		$.ajax({
-                url:url,
+    			url:"/getObsTimebyLocationName",
+    			dataType:"json",
+    			type:"GET",
+    			 data:{locationName:$('#locationName').val()},
+    			success:function(response){
+    			    $.each(response,function(index,value){
+    			    	$('#obsTime').html("");
+    			    	$('#obsTime').append('<option value="'+value+'">'+value+'</option>');
+    			    })
+    			    $('#obsTime option:first').change();
+    			
+    			}
+    		})
+    	})
+    	
+    	$('#obsTime').on('change',function(){
+    		$.ajax({
+                url:"/findByLocationNameAndTime",
                 dataType: "json",
-                data:{locationName:$('#locationName').val()},
+                data:{
+                	locationName:$('#locationName').val(),
+                	obsTime:$('#obsTime').val()	
+                },
                 type: "GET",
                 success: function(response){
-                    $('#obsTime').text(response._embedded.locations[0].time.obsTime);
-                    var weather = response._embedded.locations[0].weatherElement;
+                
+                    var weather = response[0].weatherElement;
                     console.log(weather);
                     $.each(weather,function(index,value){
                     	var text = value.elementValue[0].value;
@@ -120,6 +141,7 @@
                     	}
                     	$('#'+value.elementName).text(text);
                     })
+                  
                 }
             })
     	})
