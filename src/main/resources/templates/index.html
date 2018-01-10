@@ -110,8 +110,10 @@
     			type:"GET",
     			 data:{locationName:$('#locationName').val()},
     			success:function(response){
+    				console.log(response);
+    				$('#obsTime').html("");
     			    $.each(response,function(index,value){
-    			    	$('#obsTime').html("");
+    			    	
     			    	$('#obsTime').append('<option value="'+value+'">'+value+'</option>');
     			    })
     			    $('#obsTime option:first').change();

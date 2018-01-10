@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -25,6 +26,7 @@ import com.my.weather.repository.LocationRepository;
 public class LocationController {
     private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'+08:00'");
     
+   
     @Autowired
     LocationRepository repo;
     
@@ -52,6 +54,7 @@ public class LocationController {
     @RequestMapping(value="/getObsTimebyLocationName")
     public Set<String> getObsTimeByLocationName(@RequestParam String locationName){
         Set<String> obsTime =  new HashSet<String>(); 
+        format.setTimeZone(TimeZone.getTimeZone("Asia/Taipei"));
         List<Location> location = repo.findByLocationName(locationName);
         for( Location lo : location ) {
             //利用set不重複特性取得刪除重複值
